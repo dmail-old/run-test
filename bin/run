@@ -1,0 +1,23 @@
+#!/usr/bin/env node
+
+require('system-platform');
+var path = require('path');
+
+var cwd = process.cwd();
+var testPath = process.argv[2];
+var testLocation;
+
+testLocation = path.join(cwd, 'test');
+
+global.platform.ready(function(){
+	var indexLocation = path.resolve(__dirname, '../index.js');
+
+	indexLocation = indexLocation.replace(/\\/g, '/');
+	indexLocation = 'file:///' + indexLocation;
+
+	System.import(indexLocation).then(function(exports){
+		return exports.default;
+	}).then(function(run){
+		return run(testLocation);
+	});
+});

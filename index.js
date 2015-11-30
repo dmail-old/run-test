@@ -13,13 +13,14 @@ export default function run(testDirectoryLocation){
 	var testPromise = testFileLocations.reduce(function(previous, current){
 		return previous.then(function(){
 			return System.import(current).then(function(exports){
-				return exports['default'];
-			}).then(function(test){
-				if( test ){
+				console.log(current);
+
+				if( 'default' in exports ){
+					var test = exports['default'];
+
 					if( typeof test != 'function' ){
 						throw new Error(current + ' export default must be a function');
 					}
-					console.log(current);
 
 					return new Promise(function(resolve){
 						resolve(test());
@@ -30,7 +31,10 @@ export default function run(testDirectoryLocation){
 						return Promise.reject(error);
 					});
 				}
-				return undefined;
+				else{
+					console.log('\tskipped');
+					return undefined;
+				}
 			});
 		});
 	}, Promise.resolve());
